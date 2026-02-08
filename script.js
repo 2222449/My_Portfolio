@@ -112,3 +112,43 @@ if(contactForm) {
         }, 2000);
     });
 }
+// --- GOOGLE SHEET LOGIC (Sirf ye niche paste karein) ---
+{
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyBkxMA3yxiCVRQxRvUoIRpaNdHmvwcIEYvyYU5rSG6KKsrXMnr86tmQ-mXpmIhyaEx_g/exec';
+    const form = document.forms['submit-to-google-sheet'];
+
+    if (form) {
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+
+            // Start Animation
+            submitBtn.innerHTML = 'Sending... <i class="fas fa-spinner fa-spin"></i>';
+            submitBtn.disabled = true;
+
+            fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+                .then(response => {
+                    // Success Par Button Green aur Alert
+                    submitBtn.style.background = '#3EE332';
+                    submitBtn.innerHTML = 'Message Sent! <i class="fas fa-check"></i>';
+                    
+                    alert("Thank you! Your message has been sent successfully.");
+                    form.reset();
+
+                    setTimeout(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        submitBtn.style.background = ''; 
+                    }, 3000);
+                })
+                .catch(error => {
+                    console.error('Error!', error.message);
+                    alert("Oops! Something went wrong.");
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                });
+        });
+    }
+}
